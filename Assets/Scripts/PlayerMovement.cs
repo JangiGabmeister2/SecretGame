@@ -10,7 +10,11 @@ public class PlayerMovement : MonoBehaviour
     public Transform orientation;
 
     [Space(20)] public bool canJump;
-    [SerializeField] Transform _groundCheck;
+    private bool _isJumping;
+    [SerializeField] private int _maxJumps = 3;
+    private int _remainingJumps;
+
+    [SerializeField, Space(20)] Transform _groundCheck;
     [SerializeField] float _groundCheckDistance = 1f;
     [SerializeField] LayerMask _groundLayer;
 
@@ -19,6 +23,7 @@ public class PlayerMovement : MonoBehaviour
 
     private float _jumpBufferTime = 0.15f;
     private float _jumpBufferCounter = 0;
+
 
     private float _horizontal;
     private bool _isFacingRight = true;
@@ -37,6 +42,7 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         canJump = IsGrounded();
+        bool jump = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
 
         _moveSpeed = _normalMoveSpeed;
         GroundedMovement();
@@ -44,11 +50,13 @@ public class PlayerMovement : MonoBehaviour
         //when player walks off a surface, there is a small moment of time they can still jump despite being off the platform.
         //after this time they cannot jump again until they've landed
         #region Jumping and Coyote Time
-        if (IsGrounded())
+        if (IsGrounded() || (_isJumping && _remainingJumps > 0))
         {
             _coyoteTimeCounter = _coyoteTime;
 
             anim.isFalling = false;
+
+            _isJumping = true;
         }
         else
         {
@@ -58,9 +66,17 @@ public class PlayerMovement : MonoBehaviour
                 anim.isFalling = true;
         }
 
+        //checks whether the player is on the ground and is not jumping,
+        //if so, max jumps to make is reset to max.
+        if (IsGrounded() && !jump)
+        {
+            _isJumping = false;
+            _remainingJumps = _maxJumps;
+        }
+
         //when the jump key is pressed, the player jumps a short height
         //when the jump key is held down, the player jumps higher
-        if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
+        if (jump)
         {
             _jumpBufferCounter = _jumpBufferTime;
 
@@ -79,6 +95,8 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
 
             _jumpBufferCounter = 0f;
+
+            _remainingJumps--;
         }
 
         //when the jump key is let go, the player y velocity increases while falling
