@@ -58,6 +58,8 @@ public class PlayerMovement : MonoBehaviour
                 anim.isFalling = true;
         }
 
+        //when the jump key is pressed, the player jumps a short height
+        //when the jump key is held down, the player jumps higher
         if (Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow))
         {
             _jumpBufferCounter = _jumpBufferTime;
@@ -71,6 +73,7 @@ public class PlayerMovement : MonoBehaviour
             anim.isJumping = false;
         }
 
+        //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
         if (_jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
         {
             rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
@@ -78,7 +81,8 @@ public class PlayerMovement : MonoBehaviour
             _jumpBufferCounter = 0f;
         }
 
-        if ((Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow)) && rb.velocity.y > 0f)
+        //when the jump key is let go, the player y velocity increases while falling
+        if ((Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow)) && rb.velocity.y > 0f)
         {
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
@@ -113,6 +117,7 @@ public class PlayerMovement : MonoBehaviour
         }
         #endregion
 
+        //flips the player transform when switching horizontal directions (faces left when moving left)
         #region Transform Flipping
         if (_isFacingRight && _horizontal < 0f || !_isFacingRight && _horizontal > 0f)
         {
