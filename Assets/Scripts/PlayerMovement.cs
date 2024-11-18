@@ -156,14 +156,7 @@ public class PlayerMovement : MonoBehaviour
     //checks whether player transform is above a collider in the ground layer
     private bool IsGrounded()
     {
-        Collider2D[] cols = Physics2D.OverlapCircleAll(_groundCheck.position, _groundCheckDistance, _groundLayer);
-
-        if (cols.Length > 0)
-        {
-            return true;
-        }
-
-        return false;
+        return Physics2D.OverlapCircle(_groundCheck.position, _groundCheckDistance, _groundLayer);
     }
 
     //flips the player transform via x-axis to simulate switching directions when moving
