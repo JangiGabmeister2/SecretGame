@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
@@ -10,7 +11,6 @@ public class PlayerMovement : MonoBehaviour
     public Transform orientation;
 
     [Space(20)] public bool canJump;
-    private bool _isJumping;
     [SerializeField] private int _maxJumps = 3;
     private int _remainingJumps;
 
@@ -23,7 +23,6 @@ public class PlayerMovement : MonoBehaviour
 
     private float _jumpBufferTime = 0.15f;
     private float _jumpBufferCounter = 0;
-
 
     private float _horizontal;
     private bool _isFacingRight = true;
@@ -42,77 +41,11 @@ public class PlayerMovement : MonoBehaviour
     private void Update()
     {
         canJump = IsGrounded();
-        bool jump = Input.GetKeyDown(KeyCode.W) || Input.GetKeyDown(KeyCode.UpArrow);
 
         _moveSpeed = _normalMoveSpeed;
         GroundedMovement();
 
-        //when player walks off a surface, there is a small moment of time they can still jump despite being off the platform.
-        //after this time they cannot jump again until they've landed
-        #region Jumping and Coyote Time
-        if (IsGrounded() || (_isJumping && _remainingJumps > 0))
-        {
-            _coyoteTimeCounter = _coyoteTime;
-
-            anim.isFalling = false;
-
-            _isJumping = true;
-        }
-        else
-        {
-            _coyoteTimeCounter -= Time.deltaTime;
-
-            if (_coyoteTimeCounter <= 0)
-                anim.isFalling = true;
-        }
-
-        //checks whether the player is on the ground and is not jumping,
-        //if so, max jumps to make is reset to max.
-        if (IsGrounded() && !jump)
-        {
-            _isJumping = false;
-            _remainingJumps = _maxJumps;
-        }
-
-        //when the jump key is pressed, the player jumps a short height
-        //when the jump key is held down, the player jumps higher
-        if (jump)
-        {
-            _jumpBufferCounter = _jumpBufferTime;
-
-            anim.isJumping = true;
-        }
-        else
-        {
-            _jumpBufferCounter -= Time.deltaTime;
-
-            anim.isJumping = false;
-        }
-
-        //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
-        if (_jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
-
-            _jumpBufferCounter = 0f;
-
-            _remainingJumps--;
-        }
-
-        //when the jump key is let go, the player y velocity increases while falling
-        if ((Input.GetKeyUp(KeyCode.W) || Input.GetKeyUp(KeyCode.UpArrow)) && rb.velocity.y > 0f)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-
-            _coyoteTimeCounter = 0f;
-
-            anim.isFalling = true;
-        }
-        #endregion
-
         #region Horizontal Movement Handling
-        _horizontal = Input.GetAxis("Horizontal");
-
         if (_horizontal != 0)
         {
             orientation.localPosition = transform.right;
@@ -167,6 +100,72 @@ public class PlayerMovement : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1;
         transform.localScale = localScale;
+    }
+
+    public void Jump(InputAction.CallbackContext context)
+    {
+        //when player walks off a surface, there is a small moment of time they can still jump despite being off the platform.
+        //after this time they cannot jump again until they've landed
+        if (IsGrounded() || (context.performed && _remainingJumps > 0))
+        {
+            _coyoteTimeCounter = _coyoteTime;
+
+            anim.isFalling = false;
+        }
+        else
+        {
+            _coyoteTimeCounter -= Time.deltaTime;
+
+            if (_coyoteTimeCounter <= 0)
+                anim.isFalling = true;
+        }
+
+        //checks whether the player is on the ground and is not jumping,
+        //if so, max jumps to make is reset to max.
+        if (IsGrounded() && !context.performed)
+        {
+            _remainingJumps = _maxJumps;
+        }
+
+        //when the jump key is pressed, the player jumps a short height
+        //when the jump key is held down, the player jumps higher
+        if (context.performed)
+        {
+            _jumpBufferCounter = _jumpBufferTime;
+
+            anim.isJumping = true;
+        }
+        else
+        {
+            _jumpBufferCounter -= Time.deltaTime;
+
+            anim.isJumping = false;
+        }
+
+        //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
+        if (_jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
+
+            _jumpBufferCounter = 0f;
+
+            _remainingJumps--;
+        }
+
+        //when the jump key is let go, the player y velocity increases while falling
+        if (context.canceled && rb.velocity.y > 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+            _coyoteTimeCounter = 0f;
+
+            anim.isFalling = true;
+        }
+    }
+
+    public void Move(InputAction.CallbackContext context)
+    {
+        _horizontal = context.ReadValue<Vector2>().x;
     }
     #endregion
 }
