@@ -18,6 +18,11 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] float _groundCheckDistance = 1f;
     [SerializeField] LayerMask _groundLayer;
 
+    [SerializeField, Space(20)] private float _wallSlideSpeed = 2f;
+    [SerializeField] private Transform _wallCheck;
+    [SerializeField] private float _wallCheckDistance = .2f;
+    [SerializeField] private LayerMask _wallLayer;
+
     private float _coyoteTime = 0.15f;
     private float _coyoteTimeCounter = 0;
 
@@ -30,7 +35,6 @@ public class PlayerMovement : MonoBehaviour
 
     #region Properties
     Rigidbody2D rb => GetComponent<Rigidbody2D>();
-    PlayerAnimator anim => GetComponent<PlayerAnimator>();
     bool moving => _horizontal != 0;
     #endregion
 
@@ -43,18 +47,17 @@ public class PlayerMovement : MonoBehaviour
         canJump = IsGrounded();
 
         _moveSpeed = _normalMoveSpeed;
+
         GroundedMovement();
 
         #region Horizontal Movement Handling
         if (_horizontal != 0)
         {
             orientation.localPosition = transform.right;
-            anim.isMoving = true;
         }
         else
         {
             orientation.localPosition = transform.up;
-            anim.isMoving = false;
         }
         #endregion
 
@@ -68,11 +71,19 @@ public class PlayerMovement : MonoBehaviour
         }
         #endregion
 
-        //flips the player transform when switching horizontal directions (faces left when moving left)
         #region Transform Flipping
+        //flips the player transform when switching horizontal directions (faces left when moving left)
         if (_isFacingRight && _horizontal < 0f || !_isFacingRight && _horizontal > 0f)
         {
             Flip();
+        }
+        #endregion
+
+        #region Wall Slide
+        //when on contact with a wall
+        if (OnWall())
+        {
+            WallSlide();
         }
         #endregion
     }
@@ -102,22 +113,37 @@ public class PlayerMovement : MonoBehaviour
         transform.localScale = localScale;
     }
 
+    #region Wall Sliding/Jumping
+    //checks whether the player is facing a wall
+    private bool OnWall()
+    {
+        return Physics2D.OverlapCircle(_wallCheck.position, _wallCheckDistance, _wallLayer);
+    }
+
+    //allows the player to 'stick' to the wall and slide down it
+    private void WallSlide()
+    {
+        if (!IsGrounded() && _horizontal != 0f)
+        {
+            rb.velocity = new Vector2(rb.velocity.x, Mathf.Clamp(rb.velocity.y, -_wallSlideSpeed, float.MaxValue));
+
+            Flip();
+        }
+    }
+    #endregion
+
+    #region Jump + Coyote Jump & Jump Buffer
     public void Jump(InputAction.CallbackContext context)
     {
-        //when player walks off a surface, there is a small moment of time they can still jump despite being off the platform.
-        //after this time they cannot jump again until they've landed
+        //when the player is grounded and presses jump button,
+        //sets coyote time counter
         if (IsGrounded() || (context.performed && _remainingJumps > 0))
         {
             _coyoteTimeCounter = _coyoteTime;
-
-            anim.isFalling = false;
         }
         else
         {
             _coyoteTimeCounter -= Time.deltaTime;
-
-            if (_coyoteTimeCounter <= 0)
-                anim.isFalling = true;
         }
 
         //checks whether the player is on the ground and is not jumping,
@@ -132,14 +158,10 @@ public class PlayerMovement : MonoBehaviour
         if (context.performed)
         {
             _jumpBufferCounter = _jumpBufferTime;
-
-            anim.isJumping = true;
         }
         else
         {
             _jumpBufferCounter -= Time.deltaTime;
-
-            anim.isJumping = false;
         }
 
         //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
@@ -158,10 +180,9 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
 
             _coyoteTimeCounter = 0f;
-
-            anim.isFalling = true;
         }
     }
+    #endregion
 
     public void Move(InputAction.CallbackContext context)
     {
