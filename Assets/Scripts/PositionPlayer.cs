@@ -11,7 +11,8 @@ public class PositionPlayer : MonoBehaviour
         {
             justY = false;
         }
-        else if (justY)
+        
+        if (justY)
         {
             justX = false;
         }
