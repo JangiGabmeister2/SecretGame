@@ -11,6 +11,7 @@ public class PlayerMovement : MonoBehaviour
     public Transform orientation;
 
     [Space(20)] public bool canJump;
+    private bool _isJumping;
     [SerializeField] private int _maxJumps = 3;
     private int _remainingJumps;
 
@@ -137,9 +138,13 @@ public class PlayerMovement : MonoBehaviour
     {
         //when the player is grounded and presses jump button,
         //sets coyote time counter
-        if (IsGrounded() || (context.performed && _remainingJumps > 0))
+        if (IsGrounded() || (_isJumping && _remainingJumps > 0))
         {
+            _isJumping = true;
+
             _coyoteTimeCounter = _coyoteTime;
+
+            _remainingJumps--;
         }
         else
         {
@@ -150,6 +155,7 @@ public class PlayerMovement : MonoBehaviour
         //if so, max jumps to make is reset to max.
         if (IsGrounded() && !context.performed)
         {
+            _isJumping = false;
             _remainingJumps = _maxJumps;
         }
 
@@ -170,8 +176,6 @@ public class PlayerMovement : MonoBehaviour
             rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
 
             _jumpBufferCounter = 0f;
-
-            _remainingJumps--;
         }
 
         //when the jump key is let go, the player y velocity increases while falling
