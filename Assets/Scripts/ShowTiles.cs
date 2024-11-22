@@ -2,10 +2,12 @@ using UnityEngine;
 
 public class ShowTiles : MonoBehaviour
 {
+    [SerializeField] private Sprite _sprite;
+
     SpriteRenderer sr => GetComponent<SpriteRenderer>();
 
     public void BecomeVisible()
     {
-        sr.color = new Color(255, 18, 0, 255);
+        sr.sprite = _sprite;
     }
 }
