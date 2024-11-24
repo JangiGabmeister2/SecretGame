@@ -13,10 +13,10 @@ public class PlayerMovement : MonoBehaviour
     public Transform orientation;
 
     [Space(20)] public bool canJump;
-    private bool _notGrounded;
+    private bool _isJumping;
     private bool _jumpPress;
     [SerializeField] private int _maxJumps = 3;
-    [SerializeField] private int _remainingJumps;
+    [SerializeField] private int _jumpsMade;
 
     [SerializeField, Space(20)] Transform _groundCheck;
     [SerializeField] float _groundCheckDistance = 1f;
@@ -109,42 +109,19 @@ public class PlayerMovement : MonoBehaviour
         //if so, max jumps to make is reset to max.
         if (IsGrounded() && !_jumpPress)
         {
-            _notGrounded = false;
-            _remainingJumps = _maxJumps;
+            _isJumping = false;
+            _jumpsMade = 0;
         }
 
         //when the jump key is pressed, the player jumps a short height
         //when the jump key is held down, the player jumps higher
         if (_jumpPress)
         {
-            if (_notGrounded && _remainingJumps > 0)
-            {
-                _remainingJumps--;
-            }
-
             _jumpBufferCounter = _jumpBufferTime;
         }
         else
         {
             _jumpBufferCounter -= Time.deltaTime;
-        }
-
-        //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
-        if (!_notGrounded && _jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
-        {
-            _notGrounded = true;
-
-            rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
-
-            _jumpBufferCounter = 0f;
-        }
-
-        //when the jump key is let go, the player y velocity increases while falling
-        if (!_jumpPress && rb.velocity.y > 0f)
-        {
-            rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-
-            _coyoteTimeCounter = 0f;
         }
         #endregion
     }
@@ -196,13 +173,38 @@ public class PlayerMovement : MonoBehaviour
     #region InputSystem Actions
     public void Jump(InputAction.CallbackContext context)
     {
-        if (context.performed)
+        if (context.started)
         {
+            //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
+            if (!_isJumping && _jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
+            {
+                _isJumping = true;
+
+                rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
+
+                _jumpBufferCounter = 0f;
+            }
+            else if (_jumpsMade < _maxJumps)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
+
+                _jumpsMade++;
+            }
+
             _jumpPress = true;
         }
-        else if (context.canceled)
+
+        if (context.canceled)
         {
             _jumpPress = false;
+
+            //when the jump key is let go, the player y velocity increases while falling
+            if (!_jumpPress && rb.velocity.y > 0f)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+                _coyoteTimeCounter = 0f;
+            }
         }
     }
 
