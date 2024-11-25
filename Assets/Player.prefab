@@ -283,7 +283,8 @@ MonoBehaviour:
   _jumpSpeed: 15
   orientation: {fileID: 803108596231892957}
   canJump: 0
-  _maxJumps: 1
+  _maxJumps: 2
+  _jumpsMade: 0
   _groundCheck: {fileID: 6621751825105695893}
   _groundCheckDistance: 0.2
   _groundLayer:
@@ -409,14 +410,6 @@ MonoBehaviour:
         m_CallState: 2
     m_ActionId: 1a4157dd-5e27-450c-9b33-6647c1baf113
     m_ActionName: Player/Move[/Keyboard/w,/Keyboard/upArrow,/Keyboard/s,/Keyboard/downArrow,/Keyboard/a,/Keyboard/leftArrow,/Keyboard/d,/Keyboard/rightArrow]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 3e0eb5f1-62bb-44de-bdf1-78d7b7ee16e4
-    m_ActionName: Player/Look[/Mouse/delta]
-  - m_PersistentCalls:
-      m_Calls: []
-    m_ActionId: 6149bc7a-03db-468b-bec4-7d182b4cd380
-    m_ActionName: Player/Fire[/Mouse/leftButton]
   - m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 4371098649004543476}

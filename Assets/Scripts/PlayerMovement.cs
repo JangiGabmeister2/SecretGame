@@ -1,13 +1,11 @@
-using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.InputSystem.Interactions;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class PlayerMovement : MonoBehaviour
 {
     #region Variables
-    [SerializeField] float _normalMoveSpeed = 8f;
+    [SerializeField] float _walkSpeed = 8f;
     private float _moveSpeed;
     [SerializeField] float _jumpSpeed = 20f;
     public Transform orientation;
@@ -54,7 +52,7 @@ public class PlayerMovement : MonoBehaviour
     {
         canJump = IsGrounded();
 
-        _moveSpeed = _normalMoveSpeed;
+        _moveSpeed = _walkSpeed;
 
         #region Horizontal Movement Handling
         if (_horizontal != 0)
@@ -94,8 +92,8 @@ public class PlayerMovement : MonoBehaviour
         #endregion
 
         #region Multiple Jumping + Coyote/Jump Buffer Timing
-        //when the player is grounded and presses jump button,
-        //sets coyote time counter
+        //when the player is grounded and presses jump button, sets coyote time counter
+        //so when player runs off a platform, even while the player is no longer on the ground, player can still jump
         if (IsGrounded())
         {
             _coyoteTimeCounter = _coyoteTime;
@@ -106,15 +104,15 @@ public class PlayerMovement : MonoBehaviour
         }
 
         //checks whether the player is on the ground and is not jumping,
-        //if so, max jumps to make is reset to max.
+        //if so, jumps made is reset to 0.
         if (IsGrounded() && !_jumpPress)
         {
             _isJumping = false;
             _jumpsMade = 0;
         }
 
-        //when the jump key is pressed, the player jumps a short height
-        //when the jump key is held down, the player jumps higher
+        //when the jump key is pressed, sets jump buffer time
+        //so when falling, while player is just above the ground but isn't grounded, pressing jump, still allows player to jump
         if (_jumpPress)
         {
             _jumpBufferCounter = _jumpBufferTime;
@@ -173,9 +171,12 @@ public class PlayerMovement : MonoBehaviour
     #region InputSystem Actions
     public void Jump(InputAction.CallbackContext context)
     {
+        //when the jump key is pressed...
         if (context.started)
         {
-            //when a player jumps, immediately before the player lands, if the jump key is pressed, the player will jump even while not currently on the 'ground'. 
+            rb.gravityScale = 4f;
+
+            //player will jump, so long as they're grounded and jump buffer and coyote times are above 0
             if (!_isJumping && _jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
             {
                 _isJumping = true;
@@ -184,6 +185,7 @@ public class PlayerMovement : MonoBehaviour
 
                 _jumpBufferCounter = 0f;
             }
+            //while not grounded, can perform extra jump/s, so long as they're able to
             else if (_jumpsMade < _maxJumps)
             {
                 rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
@@ -194,11 +196,14 @@ public class PlayerMovement : MonoBehaviour
             _jumpPress = true;
         }
 
+        //when the jump key is released...
         if (context.canceled)
         {
             _jumpPress = false;
 
-            //when the jump key is let go, the player y velocity increases while falling
+            rb.gravityScale = 8f;
+
+            //player jump speed is clamped and falls, making a small jump
             if (!_jumpPress && rb.velocity.y > 0f)
             {
                 rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
@@ -214,5 +219,9 @@ public class PlayerMovement : MonoBehaviour
     }
     #endregion
 
+    public void IncreaseMaxJumps()
+    {
+        _maxJumps++;
+    }
     #endregion
 }
