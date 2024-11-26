@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -15,6 +16,13 @@ public class PlayerMovement : MonoBehaviour
     private bool _jumpPress;
     [SerializeField] private int _maxJumps = 3;
     [SerializeField] private int _jumpsMade;
+
+    [SerializeField, Space(20)] private bool _canDash;
+    private bool _isDashing;
+    [SerializeField] private bool _dashActivated = false;
+    [SerializeField] private float _dashSpeed = 30f;
+    [SerializeField] private float _dashTime = .2f;
+    [SerializeField] private float _dashCooldown = 1f;
 
     [SerializeField, Space(20)] Transform _groundCheck;
     [SerializeField] float _groundCheckDistance = 1f;
@@ -128,9 +136,16 @@ public class PlayerMovement : MonoBehaviour
     //moves player upon giving control inputs
     private void GroundedMovement()
     {
-        float speed = _moveSpeed * _horizontal;
+        if (!_isDashing)
+        {
+            float speed = _moveSpeed * _horizontal;
 
-        rb.velocity = new Vector2(speed, rb.velocity.y);
+            rb.velocity = new Vector2(speed, rb.velocity.y);
+        }
+        else
+        {
+            rb.velocity = new Vector2(transform.localScale.x * _dashSpeed, 0f);
+        }
     }
 
     //checks whether player transform is above a collider in the ground layer
@@ -147,6 +162,31 @@ public class PlayerMovement : MonoBehaviour
         Vector3 localScale = transform.localScale;
         localScale.x *= -1;
         transform.localScale = localScale;
+    }
+
+    //when called, the player performs a dashing ability
+    //where the player zooms forward for a short amount of time, ignoring gravity and previous y velocity.
+    private IEnumerator ExecuteDash()
+    {
+        _canDash = false;
+
+        float grav = rb.gravityScale;
+        rb.gravityScale = 0f;
+
+        _isDashing = true;
+
+        yield return new WaitForSeconds(_dashTime);
+
+        rb.gravityScale = grav;
+        _isDashing = false;
+
+        yield return new WaitForSeconds(_dashCooldown);
+        _canDash = true;
+    }
+
+    public void EnableDash()
+    {
+        _dashActivated = true;
     }
 
     #region Wall Sliding
@@ -194,6 +234,7 @@ public class PlayerMovement : MonoBehaviour
             }
 
             _jumpPress = true;
+            _canDash = true;
         }
 
         //when the jump key is released...
@@ -216,6 +257,12 @@ public class PlayerMovement : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         _horizontal = context.ReadValue<Vector2>().x;
+    }
+
+    public void Dash(InputAction.CallbackContext context)
+    {
+        if (context.started && _canDash && _dashActivated)
+            StartCoroutine(ExecuteDash());
     }
     #endregion
 

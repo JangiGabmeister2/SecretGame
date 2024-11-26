@@ -6,6 +6,7 @@ public class GameManager : MonoBehaviour
 {
     [SerializeField] private List<ShowTiles> secretTiles;
     [SerializeField] private List<Tilemap> levels;
+    [SerializeField] private List<Tilemap> hiddenTiles;
 
     private void Start()
     {
@@ -33,6 +34,14 @@ public class GameManager : MonoBehaviour
         foreach (var level in levels)
         {
             level.gameObject.SetActive(false);
+        }
+    }
+
+    public void ShowAllHiddenTiles()
+    {
+        foreach(var level in hiddenTiles)
+        {
+            level.gameObject.SetActive(true);
         }
     }
 }
