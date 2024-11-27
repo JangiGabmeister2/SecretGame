@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7775710288653505362}
   - component: {fileID: 255369767430499475}
   - component: {fileID: 9164283429262938061}
+  - component: {fileID: -3915030371504973712}
   m_Layer: 0
   m_Name: Hyper-Awareness Goggles
   m_TagString: Untagged
@@ -32,7 +33,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 8449437952470163550}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!212 &3998462084009336503
@@ -201,3 +203,78 @@ MonoBehaviour:
   onExit:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &-3915030371504973712
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1679135034612528625}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f174781ef34660d47a13e207586abfba, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _relativePos: 0.2
+--- !u!1001 &8256914027906580562
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 5255943835781951287}
+    m_Modifications:
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.063
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -0.132
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 5789652553602059131, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+      propertyPath: m_Name
+      value: Shiny
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+--- !u!4 &8449437952470163550 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 564107203552731148, guid: 02ac327286da78545bfb15bb5ae8578f, type: 3}
+  m_PrefabInstance: {fileID: 8256914027906580562}
+  m_PrefabAsset: {fileID: 0}
