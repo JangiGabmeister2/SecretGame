@@ -17,6 +17,12 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private int _maxJumps = 3;
     [SerializeField] private int _jumpsMade;
 
+    private float _coyoteTime = 0.15f;
+    private float _coyoteTimeCounter = 0;
+
+    private float _jumpBufferTime = 0.15f;
+    private float _jumpBufferCounter = 0;
+
     [SerializeField, Space(20)] private bool _canDash;
     private bool _isDashing;
     [SerializeField] private bool _dashActivated = false;
@@ -33,14 +39,10 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField] private float _wallCheckDistance = .2f;
     [SerializeField] private LayerMask _wallLayer;
 
-    private float _coyoteTime = 0.15f;
-    private float _coyoteTimeCounter = 0;
-
-    private float _jumpBufferTime = 0.15f;
-    private float _jumpBufferCounter = 0;
-
     private float _horizontal;
     private bool _isFacingRight = true;
+
+    private KeyCode[] _jumpKeys = new KeyCode[] { KeyCode.W, KeyCode.Space, KeyCode.UpArrow };
     #endregion
 
     #region Properties
@@ -113,7 +115,7 @@ public class PlayerMovement : MonoBehaviour
 
         //checks whether the player is on the ground and is not jumping,
         //if so, jumps made is reset to 0.
-        if (IsGrounded() && !_jumpPress)
+        if (IsGrounded() && !CheckButtonsDown(_jumpKeys))
         {
             _isJumping = false;
             _jumpsMade = 0;
@@ -121,13 +123,47 @@ public class PlayerMovement : MonoBehaviour
 
         //when the jump key is pressed, sets jump buffer time
         //so when falling, while player is just above the ground but isn't grounded, pressing jump, still allows player to jump
-        if (_jumpPress)
+        if (CheckButtonsDown(_jumpKeys))
         {
             _jumpBufferCounter = _jumpBufferTime;
         }
         else
         {
             _jumpBufferCounter -= Time.deltaTime;
+        }
+
+        //when the jump key is pressed...
+        if (CheckButtonsDown(_jumpKeys))
+        {
+            //player will jump, so long as they're grounded and jump buffer and coyote times are above 0
+            //while not grounded, can perform extra jump/s, so long as they're able to
+            if (!_isJumping && _jumpBufferCounter > 0 && _coyoteTimeCounter > 0 || _jumpsMade < _maxJumps)
+            {
+                _jumpsMade++;
+
+                _isJumping = true;
+
+                rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
+
+                _jumpBufferCounter = 0f;
+            }
+
+            rb.gravityScale = 4f;
+            _canDash = true;
+        }
+
+        //when the jump key is released...
+        if (CheckButtonsUp(_jumpKeys))
+        {
+            rb.gravityScale = 8f;
+
+            //player jump speed is clamped and falls, making a small jump
+            if (!_jumpPress && rb.velocity.y > 0f)
+            {
+                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
+
+                _coyoteTimeCounter = 0f;
+            }
         }
         #endregion
     }
@@ -181,7 +217,47 @@ public class PlayerMovement : MonoBehaviour
         _isDashing = false;
 
         yield return new WaitForSeconds(_dashCooldown);
+
         _canDash = true;
+    }
+
+    private bool CheckButtonHold(KeyCode[] keys)
+    {
+        foreach (KeyCode key in keys)
+        {
+            if (Input.GetKey(key))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool CheckButtonsDown(KeyCode[] keys)
+    {
+        foreach (KeyCode keyCode in keys)
+        {
+            if (Input.GetKeyDown(keyCode))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool CheckButtonsUp(KeyCode[] keys)
+    {
+        foreach (KeyCode keyCode in keys)
+        {
+            if (Input.GetKeyUp(keyCode))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public void EnableDash()
@@ -209,51 +285,6 @@ public class PlayerMovement : MonoBehaviour
     #endregion
 
     #region InputSystem Actions
-    public void Jump(InputAction.CallbackContext context)
-    {
-        //when the jump key is pressed...
-        if (context.started)
-        {
-            rb.gravityScale = 4f;
-
-            //player will jump, so long as they're grounded and jump buffer and coyote times are above 0
-            if (!_isJumping && _jumpBufferCounter > 0 && _coyoteTimeCounter > 0)
-            {
-                _isJumping = true;
-
-                rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
-
-                _jumpBufferCounter = 0f;
-            }
-            //while not grounded, can perform extra jump/s, so long as they're able to
-            else if (_jumpsMade < _maxJumps)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, _jumpSpeed);
-
-                _jumpsMade++;
-            }
-
-            _jumpPress = true;
-            _canDash = true;
-        }
-
-        //when the jump key is released...
-        if (context.canceled)
-        {
-            _jumpPress = false;
-
-            rb.gravityScale = 8f;
-
-            //player jump speed is clamped and falls, making a small jump
-            if (!_jumpPress && rb.velocity.y > 0f)
-            {
-                rb.velocity = new Vector2(rb.velocity.x, rb.velocity.y * 0.5f);
-
-                _coyoteTimeCounter = 0f;
-            }
-        }
-    }
-
     public void Move(InputAction.CallbackContext context)
     {
         _horizontal = context.ReadValue<Vector2>().x;

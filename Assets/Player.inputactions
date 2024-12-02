@@ -15,12 +15,12 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Jump",
+                    "name": "Flight",
                     "type": "Button",
-                    "id": "f7b3da94-f61e-46d3-b542-b3b3468fdd3e",
+                    "id": "37a15cb5-9988-42a9-b9ca-c047008a9986",
                     "expectedControlType": "Button",
                     "processors": "",
-                    "interactions": "",
+                    "interactions": "Hold",
                     "initialStateCheck": false
                 },
                 {
@@ -177,28 +177,6 @@
                 },
                 {
                     "name": "",
-                    "id": "84e34616-8a1a-45c1-848d-7bddc2a8c271",
-                    "path": "<Keyboard>/upArrow",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "d479861e-65ad-4bf5-97ed-d537d0a8d4ba",
-                    "path": "<Keyboard>/w",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "Keyboard&Mouse",
-                    "action": "Jump",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
                     "id": "e12034ac-0e39-414b-a0fc-b9fb18a3423d",
                     "path": "<Keyboard>/r",
                     "interactions": "",
@@ -227,6 +205,39 @@
                     "processors": "",
                     "groups": "Keyboard&Mouse",
                     "action": "Dash",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "73dc8af6-366f-4db0-8b47-18265f2f6912",
+                    "path": "<Keyboard>/upArrow",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Flight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "4163d696-7341-491d-8d6d-488c27656d7b",
+                    "path": "<Keyboard>/w",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Flight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "26bc8a2c-db42-47fd-936c-d39bfe45fb1c",
+                    "path": "<Keyboard>/space",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Flight",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

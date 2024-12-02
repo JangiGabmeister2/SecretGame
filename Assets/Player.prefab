@@ -340,7 +340,7 @@ Rigidbody2D:
   m_Mass: 1
   m_LinearDrag: 0
   m_AngularDrag: 0.05
-  m_GravityScale: 4
+  m_GravityScale: 1
   m_Material: {fileID: 6200000, guid: cfffa6b939ae9b14daf3ec1a7f683fe1, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
@@ -612,6 +612,10 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 75d81cc2-4f6f-4b4d-a4a8-bead30680b53
     m_ActionName: Player/Dash[/Keyboard/leftShift,/Keyboard/x]
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 37a15cb5-9988-42a9-b9ca-c047008a9986
+    m_ActionName: Player/Flight[/Keyboard/upArrow,/Keyboard/w,/Keyboard/space]
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: Keyboard&Mouse
   m_DefaultActionMap: Player
